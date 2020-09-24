@@ -8,7 +8,7 @@ import com.roshi.runningtrackerapp.ui.viewmodel.StaticsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class StaticsFragments:Fragment(R.layout.fragment_statics) {
+class StaticsFragment:Fragment(R.layout.fragment_statics) {
     private val viewModel: StaticsViewModel by viewModels()
 
 }

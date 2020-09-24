@@ -7,6 +7,6 @@ import com.roshi.runningtrackerapp.ui.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RunFragments:Fragment(R.layout.fragment_run) {
+class RunFragment:Fragment(R.layout.fragment_run) {
     private val viewModel: MainViewModel by viewModels()
 }
