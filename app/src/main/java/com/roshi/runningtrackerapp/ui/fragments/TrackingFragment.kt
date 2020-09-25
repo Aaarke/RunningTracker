@@ -17,6 +17,7 @@ import com.roshi.runningtrackerapp.other.Constant.ACTION_START_OR_RESUME_SERVICE
 import com.roshi.runningtrackerapp.other.Constant.MAP_ZOOM
 import com.roshi.runningtrackerapp.other.Constant.POLY_LINE_COLOR
 import com.roshi.runningtrackerapp.other.Constant.POLY_LINE_WIDTH
+import com.roshi.runningtrackerapp.other.TrackingUtility
 import com.roshi.runningtrackerapp.service.PolyLine
 import com.roshi.runningtrackerapp.service.PolyLines
 import com.roshi.runningtrackerapp.service.TrackingService
@@ -30,6 +31,7 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
     private var isTracking:Boolean=false
     private var pathPoints= mutableListOf<PolyLine>()
     private var map: GoogleMap? = null
+    private var currentTimeInmillis=0L
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mapView?.onCreate(savedInstanceState)
@@ -100,6 +102,12 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
             addLatestPolyLines()
             moveCameraToUser()
 
+        })
+
+        TrackingService.timeRunInMillis.observe(viewLifecycleOwner, Observer {
+            currentTimeInmillis=it
+            val formattedTimes=TrackingUtility.getFormattedStopWatchTime(currentTimeInmillis,false)
+            tvTimer.text = formattedTimes
         })
     }
 
