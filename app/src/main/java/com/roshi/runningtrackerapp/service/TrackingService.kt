@@ -33,19 +33,25 @@ import com.roshi.runningtrackerapp.other.Constant.NOTIFICATION_CHANNEL_NAME
 import com.roshi.runningtrackerapp.other.Constant.NOTIFICATION_ID
 import com.roshi.runningtrackerapp.other.TrackingUtility
 import com.roshi.runningtrackerapp.ui.MainActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 typealias PolyLine = MutableList<LatLng>
 typealias PolyLines = MutableList<PolyLine>
-
+@AndroidEntryPoint
 class TrackingService : LifecycleService() {
     var isFirstRun: Boolean = true
+    @Inject
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
     private var timeRunInSeconds = MutableLiveData<Long>()
+    @Inject
+    lateinit var baseNotificationBuilder:NotificationCompat.Builder
 
     companion object {
         val timeRunInMillis = MutableLiveData<Long>()
@@ -117,14 +123,8 @@ class TrackingService : LifecycleService() {
             createNotificationChannel(notificationManager)
         }
 
-        val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setAutoCancel(false)
-            .setOngoing(true)
-            .setSmallIcon(R.drawable.ic_direction_run_black)
-            .setContentTitle("Running App")
-            .setContentText("00:00:00")
-            .setContentIntent(getMainActivityPendingIntent())
-        startForeground(NOTIFICATION_ID, notificationBuilder.build())
+
+        startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
     }
 
 
@@ -209,14 +209,6 @@ class TrackingService : LifecycleService() {
         }
     }
 
-    private fun getMainActivityPendingIntent() = PendingIntent.getActivity(
-        this,
-        0,
-        Intent(this, MainActivity::class.java).also {
-            it.action = ACTION_SHOW_TRACKING_FRAGMENT
-        },
-        FLAG_UPDATE_CURRENT
-    )
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(notificationManager: NotificationManager) {
