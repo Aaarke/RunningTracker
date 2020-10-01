@@ -154,6 +154,7 @@ class TrackingService : LifecycleService() {
     }
 
     private var isTimerEnabled = false
+
     private var lapTime = 0L
     private var timeRun = 0L
     private var timeStarted = 0L
