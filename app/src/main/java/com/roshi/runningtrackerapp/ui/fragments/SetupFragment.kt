@@ -7,7 +7,7 @@ import androidx.navigation.fragment.findNavController
 import com.roshi.runningtrackerapp.R
 import kotlinx.android.synthetic.main.fragment_setup.*
 
-class SetupFragment:Fragment(R.layout.fragment_setup) {
+class SetupFragment : Fragment(R.layout.fragment_setup) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tvContinue.setOnClickListener {

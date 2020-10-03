@@ -8,6 +8,23 @@
     <string name="sort_by">Sort by:</string>
     <string name="kg">kg</string>
     <string name="stop">Stop</string>
+    <string name="are_you_sure">Are you sure you want to cancel the current run and delete all it\'s data?</string>
+    <string name="cancel_run">Cancel the Run?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="run_data_save">Run data save successfully</string>
+    <string name="total_distance">Total Distance</string>
+    <string name="_0km">0km</string>
+    <string name="total_time">Total Time</string>
+    <string name="_00_00_00">00:00:00</string>
+    <string name="total_calories_burned">Total Calories Burned</string>
+    <string name="_0kcal">0kcal</string>
+    <string name="average_speed">Average Speed</string>
+    <string name="_0km_h">0km/h</string>
+    <string name="let_s_go_usernames">Let\'s go, USERNAME!</string>
+    <string name="finish_run">Finish Run</string>
+    <string name="start">Start</string>
+    <string name="_00_00_00_00">00:00:00:00</string>
     <string-array name="filter_options">
         <item>Date</item>
         <item>Running Time</item>

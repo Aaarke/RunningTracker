@@ -8,9 +8,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.roshi.runningtrackerapp.R
+import com.roshi.runningtrackerapp.db.RunData
 import com.roshi.runningtrackerapp.other.Constant.ACTION_PAUSE_SERVICE
 import com.roshi.runningtrackerapp.other.Constant.ACTION_START_OR_RESUME_SERVICE
 import com.roshi.runningtrackerapp.other.Constant.ACTION_STOP__SERVICE
@@ -23,6 +26,8 @@ import com.roshi.runningtrackerapp.service.TrackingService
 import com.roshi.runningtrackerapp.ui.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_tracking.*
+import java.util.*
+import kotlin.math.round
 
 @AndroidEntryPoint
 class TrackingFragment : Fragment(R.layout.fragment_tracking) {
@@ -32,6 +37,7 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
     private var map: GoogleMap? = null
     private var currentTimeInmillis = 0L
     private var menu: Menu? = null
+    private var weight = 60f
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,6 +58,10 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
         mapView.getMapAsync {
             map = it
             addAllPolyLines()
+        }
+        btnFinishRun.setOnClickListener {
+            zoomToSeeWholeTrack()
+            endRunAndSaveToDb()
         }
         subscribeToObserver()
 
@@ -110,16 +120,60 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun zoomToSeeWholeTrack() {
+        val bound = LatLngBounds.builder()
+        for (polyline in pathPoints) {
+            for (pos in polyline) {
+                bound.include(pos)
+            }
+        }
+        map?.moveCamera(
+            CameraUpdateFactory.newLatLngBounds(
+                bound.build(),
+                mapView.width,
+                mapView.height,
+                (mapView.height * 0.05f).toInt()
+            )
+        )
+    }
+
+    private fun endRunAndSaveToDb() {
+        map?.snapshot { bmp ->
+            var distanceInMeters = 0
+            for (polyline in pathPoints) {
+                distanceInMeters += TrackingUtility.calculatePolyLine(polyline).toInt()
+            }
+            val avgSpeed =
+                round((distanceInMeters / 1000f) / (currentTimeInmillis / 1000f / 60 / 60) * 10) / 10f
+            val dateTimeStamp = Calendar.getInstance().timeInMillis
+            val caloriesBurned = ((distanceInMeters / 1000f) * weight).toInt()
+            val run = RunData(
+                bmp,
+                timeStamp = dateTimeStamp,
+                averageSpeed = avgSpeed,
+                distanceInMeters = distanceInMeters,
+                currentTimeInmillis,
+                caloriesBurned = caloriesBurned
+            )
+            viewModel.insertRun(run)
+            Snackbar.make(
+                requireActivity().findViewById(R.id.rootView),
+                getString(R.string.run_data_save),
+                Snackbar.LENGTH_LONG
+            ).show()
+            stopRun()
+        }
+    }
 
 
     private fun showCancelTrackingDialog() {
         val dialog = MaterialAlertDialogBuilder(requireContext(), R.style.AlertDialogTheme)
-            .setTitle("Cancel the Run?")
-            .setMessage("Are you sure you want to cancel the current run and delete all it's data?")
+            .setTitle(getString(R.string.cancel_run))
+            .setMessage(getString(R.string.are_you_sure))
             .setIcon(R.drawable.ic_delete)
-            .setPositiveButton("Yes") { _, _ ->
+            .setPositiveButton(getString(R.string.yes)) { _, _ ->
                 stopRun()
-            }.setNegativeButton("No") { dialogInterFace, _ ->
+            }.setNegativeButton(getString(R.string.no)) { dialogInterFace, _ ->
                 dialogInterFace.cancel()
             }
             .create()
@@ -138,7 +192,7 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
             btnFinishRun.visibility = View.VISIBLE
         } else {
             btnToggleRun.text = getString(R.string.stop)
-            menu?.getItem(0)?.isVisible=true
+            menu?.getItem(0)?.isVisible = true
             btnFinishRun.visibility = View.GONE
 
         }
@@ -147,7 +201,7 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
 
     private fun toggleRun() {
         if (isTracking) {
-            menu?.getItem(0)?.isVisible=true
+            menu?.getItem(0)?.isVisible = true
             sendCommandToService(ACTION_PAUSE_SERVICE)
         } else {
             sendCommandToService(ACTION_START_OR_RESUME_SERVICE)

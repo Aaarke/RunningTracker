@@ -4,9 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.roshi.runningtrackerapp.R
@@ -27,23 +24,17 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         bottomNavigationView.setupWithNavController(navHostFragment.findNavController())
         navHostFragment.findNavController()
-            .addOnDestinationChangedListener(object : NavController.OnDestinationChangedListener {
-                override fun onDestinationChanged(
-                    controller: NavController,
-                    destination: NavDestination,
-                    arguments: Bundle?
-                ) {
-                    when (destination.id) {
-                        R.id.settingsFragment, R.id.statisticsFragment, R.id.runFragment -> {
-                            bottomNavigationView.visibility = View.VISIBLE
-                        }
-                        else -> {
-                            bottomNavigationView.visibility = View.GONE
+            .addOnDestinationChangedListener { _, destination, _ ->
+                when (destination.id) {
+                    R.id.settingsFragment, R.id.statisticsFragment, R.id.runFragment -> {
+                        bottomNavigationView.visibility = View.VISIBLE
+                    }
+                    else -> {
+                        bottomNavigationView.visibility = View.GONE
 
-                        }
                     }
                 }
-            })
+            }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -51,8 +42,8 @@ class MainActivity : AppCompatActivity() {
         navigateToTrackingFragmentIfNeeded(intent)
     }
 
-    private fun navigateToTrackingFragmentIfNeeded(intent: Intent?){
-        if (intent?.action== Constant.ACTION_SHOW_TRACKING_FRAGMENT){
+    private fun navigateToTrackingFragmentIfNeeded(intent: Intent?) {
+        if (intent?.action == Constant.ACTION_SHOW_TRACKING_FRAGMENT) {
             navHostFragment.findNavController().navigate(R.id.action_global_trackingFragment)
         }
     }

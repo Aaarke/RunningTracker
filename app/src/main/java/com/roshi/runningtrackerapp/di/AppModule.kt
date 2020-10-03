@@ -17,10 +17,12 @@ import javax.inject.Singleton
 object AppModule {
     @Singleton
     @Provides
-    fun provideRunningDatabase(@ApplicationContext app:Context)=Room.databaseBuilder(app,
-        RunningDataBase::class.java,RUNNING_DATABASE_NAME).build()
+    fun provideRunningDatabase(@ApplicationContext app: Context) = Room.databaseBuilder(
+        app,
+        RunningDataBase::class.java, RUNNING_DATABASE_NAME
+    ).build()
 
     @Singleton
     @Provides
-    fun provideRunningDao(dataBase: RunningDataBase)=dataBase.getRunDao()
+    fun provideRunningDao(dataBase: RunningDataBase) = dataBase.getRunDao()
 }

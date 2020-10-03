@@ -21,22 +21,27 @@ import dagger.hilt.android.scopes.ServiceScoped
 object ServiceModule {
     @ServiceScoped
     @Provides
-    fun providerFusedLocationProviderClient(@ApplicationContext app:Context) =FusedLocationProviderClient(app)
+    fun providerFusedLocationProviderClient(@ApplicationContext app: Context) =
+        FusedLocationProviderClient(app)
 
     @ServiceScoped
     @Provides
-    fun providerMainActivityPendingIntent(@ApplicationContext app:Context)= PendingIntent.getActivity(
-        app,
-        0,
-        Intent(app, MainActivity::class.java).also {
-            it.action = Constant.ACTION_SHOW_TRACKING_FRAGMENT
-        },
-        PendingIntent.FLAG_UPDATE_CURRENT
-    )
+    fun providerMainActivityPendingIntent(@ApplicationContext app: Context) =
+        PendingIntent.getActivity(
+            app,
+            0,
+            Intent(app, MainActivity::class.java).also {
+                it.action = Constant.ACTION_SHOW_TRACKING_FRAGMENT
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
     @ServiceScoped
     @Provides
-    fun providerNotificationBuilder(@ApplicationContext app: Context,pendingIntent: PendingIntent)= NotificationCompat.Builder(app, Constant.NOTIFICATION_CHANNEL_ID)
+    fun providerNotificationBuilder(
+        @ApplicationContext app: Context,
+        pendingIntent: PendingIntent
+    ) = NotificationCompat.Builder(app, Constant.NOTIFICATION_CHANNEL_ID)
         .setAutoCancel(false)
         .setOngoing(true)
         .setSmallIcon(R.drawable.ic_direction_run_black)

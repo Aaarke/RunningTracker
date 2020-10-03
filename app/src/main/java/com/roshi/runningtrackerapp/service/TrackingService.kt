@@ -45,7 +45,7 @@ typealias PolyLines = MutableList<PolyLine>
 @AndroidEntryPoint
 class TrackingService : LifecycleService() {
     private var isFirstRun: Boolean = true
-    private var serviceKilled=false
+    private var serviceKilled = false
 
     @Inject
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -78,9 +78,9 @@ class TrackingService : LifecycleService() {
         })
     }
 
-    private fun killService(){
-        serviceKilled=true
-        isFirstRun=true
+    private fun killService() {
+        serviceKilled = true
+        isFirstRun = true
         pauseService()
         postInitialValues()
         stopForeground(true)
@@ -141,10 +141,14 @@ class TrackingService : LifecycleService() {
 
         startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
         timeRunInSeconds.observe(this, {
-            if (!serviceKilled){
-                val notification=currentNotificationBuilder.
-                setContentText(TrackingUtility.getFormattedStopWatchTime(it*1000,false))
-                notificationManager.notify(NOTIFICATION_ID,notification.build())
+            if (!serviceKilled) {
+                val notification = currentNotificationBuilder.setContentText(
+                    TrackingUtility.getFormattedStopWatchTime(
+                        it * 1000,
+                        false
+                    )
+                )
+                notificationManager.notify(NOTIFICATION_ID, notification.build())
             }
         })
     }
@@ -235,7 +239,7 @@ class TrackingService : LifecycleService() {
             isAccessible = true
             set(currentNotificationBuilder, ArrayList<NotificationCompat.Action>())
         }
-        if (!serviceKilled){
+        if (!serviceKilled) {
             currentNotificationBuilder = baseNotificationBuilder.addAction(
                 R.drawable.ic_pause_black_24dp,
                 notificationActionText,
