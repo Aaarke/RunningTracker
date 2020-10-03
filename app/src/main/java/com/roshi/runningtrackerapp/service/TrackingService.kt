@@ -23,7 +23,6 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.model.LatLng
 import com.roshi.runningtrackerapp.R
 import com.roshi.runningtrackerapp.other.Constant.ACTION_PAUSE_SERVICE
-import com.roshi.runningtrackerapp.other.Constant.ACTION_SHOW_TRACKING_FRAGMENT
 import com.roshi.runningtrackerapp.other.Constant.ACTION_START_OR_RESUME_SERVICE
 import com.roshi.runningtrackerapp.other.Constant.ACTION_STOP__SERVICE
 import com.roshi.runningtrackerapp.other.Constant.FASTEST_LOCATION_UPDATE_INTERVAL
@@ -32,7 +31,6 @@ import com.roshi.runningtrackerapp.other.Constant.NOTIFICATION_CHANNEL_ID
 import com.roshi.runningtrackerapp.other.Constant.NOTIFICATION_CHANNEL_NAME
 import com.roshi.runningtrackerapp.other.Constant.NOTIFICATION_ID
 import com.roshi.runningtrackerapp.other.TrackingUtility
-import com.roshi.runningtrackerapp.ui.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,15 +41,20 @@ import javax.inject.Inject
 
 typealias PolyLine = MutableList<LatLng>
 typealias PolyLines = MutableList<PolyLine>
+
 @AndroidEntryPoint
 class TrackingService : LifecycleService() {
-    var isFirstRun: Boolean = true
+    private var isFirstRun: Boolean = true
+
     @Inject
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     private var timeRunInSeconds = MutableLiveData<Long>()
+
     @Inject
-    lateinit var baseNotificationBuilder:NotificationCompat.Builder
+    lateinit var baseNotificationBuilder: NotificationCompat.Builder
+
+    private lateinit var currentNotificationBuilder: NotificationCompat.Builder
 
     companion object {
         val timeRunInMillis = MutableLiveData<Long>()
@@ -61,6 +64,7 @@ class TrackingService : LifecycleService() {
 
     override fun onCreate() {
         super.onCreate()
+        currentNotificationBuilder = baseNotificationBuilder
         postInitialValues()
         fusedLocationProviderClient = FusedLocationProviderClient(this)
         setAllObservers()
@@ -69,6 +73,7 @@ class TrackingService : LifecycleService() {
     private fun setAllObservers() {
         isTracking.observe(this, {
             updateLocationTracking(it)
+            updateNotificationTrackingState(it)
         })
     }
 
@@ -125,6 +130,12 @@ class TrackingService : LifecycleService() {
 
 
         startForeground(NOTIFICATION_ID, baseNotificationBuilder.build())
+        timeRunInSeconds.observe(this, {
+            val notification=currentNotificationBuilder.
+                    setContentText(TrackingUtility.getFormattedStopWatchTime(it*1000,false))
+            notificationManager.notify(NOTIFICATION_ID,notification.build())
+
+        })
     }
 
 
@@ -158,36 +169,67 @@ class TrackingService : LifecycleService() {
     private var lapTime = 0L
     private var timeRun = 0L
     private var timeStarted = 0L
-    private var lastSecondTimeStamp=0L
+    private var lastSecondTimeStamp = 0L
 
-    private fun startTimer(){
+    private fun startTimer() {
         addEmptyPolyLines()
         isTracking.postValue(true)
-        timeStarted=System.currentTimeMillis()
-        isTimerEnabled=true
+        timeStarted = System.currentTimeMillis()
+        isTimerEnabled = true
         CoroutineScope(Dispatchers.Main).launch {
-            while (isTracking.value!!){
+            while (isTracking.value!!) {
                 //this is the time difference between time started and now
-                lapTime=System.currentTimeMillis()-timeStarted
+                lapTime = System.currentTimeMillis() - timeStarted
                 //Post the new lapTime
-                timeRunInMillis.postValue(timeRun+lapTime)
-                if (timeRunInMillis.value!!>=lastSecondTimeStamp+1000L){
-                    timeRunInSeconds.postValue(timeRunInSeconds.value!!+1)
-                    lastSecondTimeStamp+=1000L
+                timeRunInMillis.postValue(timeRun + lapTime)
+                if (timeRunInMillis.value!! >= lastSecondTimeStamp + 1000L) {
+                    timeRunInSeconds.postValue(timeRunInSeconds.value!! + 1)
+                    lastSecondTimeStamp += 1000L
                 }
 
                 delay(50L)
 
             }
 
-            timeRun+=lapTime
+            timeRun += lapTime
         }
     }
 
     private fun pauseService() {
         isTracking.postValue(false)
-        isTimerEnabled=false
+        isTimerEnabled = false
 
+    }
+
+    private fun updateNotificationTrackingState(isTracking: Boolean) {
+        val notificationActionText = if (isTracking) "Pause" else "Resume"
+        val pendingIntent = if (isTracking) {
+            val pauseIntent = Intent(this, TrackingService::class.java).apply {
+                action = ACTION_PAUSE_SERVICE
+
+            }
+            PendingIntent.getService(this, 1, pauseIntent, FLAG_UPDATE_CURRENT)
+
+        } else {
+            val resumeIntent = Intent(this, TrackingService::class.java).apply {
+                action = ACTION_START_OR_RESUME_SERVICE
+
+            }
+            PendingIntent.getService(this, 2, resumeIntent, FLAG_UPDATE_CURRENT)
+        }
+
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        currentNotificationBuilder.javaClass.getDeclaredField("mActions").apply {
+            isAccessible = true
+            set(currentNotificationBuilder, ArrayList<NotificationCompat.Action>())
+        }
+        currentNotificationBuilder = baseNotificationBuilder.addAction(
+            R.drawable.ic_pause_black_24dp,
+            notificationActionText,
+            pendingIntent
+        )
+        notificationManager.notify(NOTIFICATION_ID, currentNotificationBuilder.build())
     }
 
     @SuppressLint("MissingPermission")
