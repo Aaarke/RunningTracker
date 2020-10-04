@@ -27,6 +27,7 @@
     <string name="distance">DISTANCE</string>
     <string name="avgspeed">AVGSPEED</string>
     <string name="calories">CALORIES</string>
+    <string name="please_enter_all_field">Please Enter all the field</string>
     <string-array name="filter_options">
         <item>Date</item>
         <item>Running Time</item>
