@@ -28,6 +28,7 @@
     <string name="avgspeed">AVGSPEED</string>
     <string name="calories">CALORIES</string>
     <string name="please_enter_all_field">Please Enter all the field</string>
+    <string name="saved_to_shared">Saved to sharedPreferences</string>
     <string-array name="filter_options">
         <item>Date</item>
         <item>Running Time</item>
