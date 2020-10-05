@@ -1,6 +1,5 @@
 package com.roshi.runningtrackerapp.di
 
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -26,7 +25,7 @@ object ServiceModule {
 
     @ServiceScoped
     @Provides
-    fun providerMainActivityPendingIntent(@ApplicationContext app: Context) =
+    fun providerMainActivityPendingIntent(@ApplicationContext app: Context): PendingIntent =
         PendingIntent.getActivity(
             app,
             0,
@@ -41,7 +40,7 @@ object ServiceModule {
     fun providerNotificationBuilder(
         @ApplicationContext app: Context,
         pendingIntent: PendingIntent
-    ) = NotificationCompat.Builder(app, Constant.NOTIFICATION_CHANNEL_ID)
+    ): NotificationCompat.Builder? = NotificationCompat.Builder(app, Constant.NOTIFICATION_CHANNEL_ID)
         .setAutoCancel(false)
         .setOngoing(true)
         .setSmallIcon(R.drawable.ic_direction_run_black)

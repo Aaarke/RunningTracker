@@ -14,7 +14,6 @@ import com.roshi.runningtrackerapp.other.Constant.KEY_WEIGHT
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_setup.*
-import java.util.prefs.AbstractPreferences
 import javax.inject.Inject
 
 @AndroidEntryPoint

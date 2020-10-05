@@ -9,7 +9,7 @@ import com.roshi.runningtrackerapp.other.SortType
 import com.roshi.runningtrackerapp.repository.MainRepository
 import kotlinx.coroutines.launch
 
-class MainViewModel @ViewModelInject constructor(val mainRepository: MainRepository) : ViewModel() {
+class MainViewModel @ViewModelInject constructor(private val mainRepository: MainRepository) : ViewModel() {
 
 
     private val runSortedByDate = mainRepository.getAllRunSortedByDate()

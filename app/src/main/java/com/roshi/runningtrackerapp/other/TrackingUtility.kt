@@ -27,7 +27,7 @@ object TrackingUtility {
 
     fun getFormattedStopWatchTime(ms: Long, includeMillis: Boolean): String {
         var miliseconds = ms
-        var hours = TimeUnit.MILLISECONDS.toHours(miliseconds)
+        val hours = TimeUnit.MILLISECONDS.toHours(miliseconds)
         miliseconds -= TimeUnit.HOURS.toMillis(hours)
         val miniutes = TimeUnit.MILLISECONDS.toMinutes(miliseconds)
         miliseconds -= TimeUnit.MINUTES.toMillis(miniutes)
@@ -50,7 +50,7 @@ object TrackingUtility {
         for (i in 0..polyLine.size - 2) {
             val pos1 = polyLine[i]
             val pos2 = polyLine[i + 1]
-            var result = FloatArray(1)
+            val result = FloatArray(1)
             Location.distanceBetween(
                 pos1.latitude,
                 pos1.longitude,

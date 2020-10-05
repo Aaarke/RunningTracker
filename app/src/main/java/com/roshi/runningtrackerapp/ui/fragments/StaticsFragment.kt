@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.roshi.runningtrackerapp.R
 import com.roshi.runningtrackerapp.other.TrackingUtility
-import com.roshi.runningtrackerapp.ui.viewmodel.MainViewModel
 import com.roshi.runningtrackerapp.ui.viewmodel.StaticsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_statics.*
@@ -22,14 +20,14 @@ class StaticsFragment : Fragment(R.layout.fragment_statics) {
     }
 
     private fun subscribeToObserver(){
-        viewModel.getTotalTimeRun.observe(viewLifecycleOwner, Observer {
+        viewModel.getTotalTimeRun.observe(viewLifecycleOwner, {
             it?.let {
                val totalTimeRun=TrackingUtility.getFormattedStopWatchTime(it,false)
                 tvTotalTime.text=totalTimeRun
             }
         })
 
-        viewModel.getTotalCalorieBurned.observe(viewLifecycleOwner, Observer {
+        viewModel.getTotalCalorieBurned.observe(viewLifecycleOwner, {
             it?.let {
                 val totalCaloriesBurned="${it}kcal"
                 tvTotalCalories.text=totalCaloriesBurned
@@ -37,14 +35,14 @@ class StaticsFragment : Fragment(R.layout.fragment_statics) {
         
         })
 
-        viewModel.getTotalAverageSpeed.observe(viewLifecycleOwner, Observer {
+        viewModel.getTotalAverageSpeed.observe(viewLifecycleOwner, {
             val avgSped= round(it*10f)/10f
             val avgSpeedString="${avgSped}Km/h"
             tvAverageSpeed.text=avgSpeedString
 
         })
 
-        viewModel.totalDistance.observe(viewLifecycleOwner, Observer {
+        viewModel.totalDistance.observe(viewLifecycleOwner, {
             it?.let {
                 val km=it/1000f
                 val totalDistance= round(km*10f)/10f
@@ -54,7 +52,7 @@ class StaticsFragment : Fragment(R.layout.fragment_statics) {
             }
         })
 
-        viewModel.runsSortedByDate.observe(viewLifecycleOwner, Observer {
+        viewModel.runsSortedByDate.observe(viewLifecycleOwner, {
 
         })
     }

@@ -4,7 +4,7 @@ import com.roshi.runningtrackerapp.db.RunDao
 import com.roshi.runningtrackerapp.db.RunData
 import javax.inject.Inject
 
-class MainRepository @Inject constructor(val runDao: RunDao) {
+class MainRepository @Inject constructor(private val runDao: RunDao) {
     suspend fun insertRun(runData: RunData) = runDao.insertRunData(runData)
     suspend fun deleteRun(runData: RunData) = runDao.deleteRun(runData)
     fun getAllRunSortedByDate() = runDao.getAllRunDataSortedByDate()
