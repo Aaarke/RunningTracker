@@ -32,7 +32,7 @@ object ServiceModule {
             Intent(app, MainActivity::class.java).also {
                 it.action = Constant.ACTION_SHOW_TRACKING_FRAGMENT
             },
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
         )
 
     @ServiceScoped
@@ -40,7 +40,7 @@ object ServiceModule {
     fun providerNotificationBuilder(
         @ApplicationContext app: Context,
         pendingIntent: PendingIntent
-    ): NotificationCompat.Builder? = NotificationCompat.Builder(app, Constant.NOTIFICATION_CHANNEL_ID)
+    ): NotificationCompat.Builder = NotificationCompat.Builder(app, Constant.NOTIFICATION_CHANNEL_ID)
         .setAutoCancel(false)
         .setOngoing(true)
         .setSmallIcon(R.drawable.ic_direction_run_black)

@@ -35,12 +35,12 @@ class StaticsFragment : Fragment(R.layout.fragment_statics) {
         
         })
 
-        viewModel.getTotalAverageSpeed.observe(viewLifecycleOwner, {
-            val avgSped= round(it*10f)/10f
-            val avgSpeedString="${avgSped}Km/h"
-            tvAverageSpeed.text=avgSpeedString
+        viewModel.getTotalAverageSpeed.observe(viewLifecycleOwner) {
+            val avgSped = round(it * 10f) / 10f
+            val avgSpeedString = "${avgSped}Km/h"
+            tvAverageSpeed.text = avgSpeedString
 
-        })
+        }
 
         viewModel.totalDistance.observe(viewLifecycleOwner, {
             it?.let {
